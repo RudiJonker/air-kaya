@@ -1,7 +1,15 @@
+import React, { useEffect } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { colors } from '../../styles/theme';
+import { colors, fonts, spacing } from '../../styles/theme';
 
-export default function SplashScreen() {
+export default function SplashScreen({ navigation }) {
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      navigation.replace('Welcome');
+    }, 2000);
+    return () => clearTimeout(timer);
+  }, []);
+
   return (
     <View style={styles.container}>
       <Text style={styles.emoji}>🏠</Text>
@@ -18,20 +26,17 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  emoji: {
-    fontSize: 64,
-    marginBottom: 16,
-  },
+  emoji: { fontSize: 64, marginBottom: spacing.md },
   title: {
-    fontSize: 42,
+    fontSize: fonts.xxlarge + 8,
     fontWeight: 'bold',
     color: colors.white,
     letterSpacing: 4,
   },
   subtitle: {
-    fontSize: 14,
+    fontSize: fonts.body,
     color: colors.primaryMid,
-    marginTop: 8,
+    marginTop: spacing.sm,
     letterSpacing: 1,
   },
 });

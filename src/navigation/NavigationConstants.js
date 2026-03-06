@@ -1,9 +1,11 @@
 export const AUTH_SCREENS = {
-  SPLASH:   'Splash',
-  WELCOME:  'Welcome',
-  LOGIN:    'Login',
-  SIGNUP:   'SignUp',
-  TERMS:    'Terms',
+  SPLASH:           'Splash',
+  WELCOME:          'Welcome',
+  LOGIN:            'Login',
+  SIGNUP:           'SignUp',
+  TERMS:            'Terms',
+  FORGOT_PASSWORD:  'ForgotPassword',
+  COMPLETE_PROFILE: 'CompleteProfile',
 };
 
 export const LANDLORD_SCREENS = {
