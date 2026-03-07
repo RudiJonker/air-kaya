@@ -4,7 +4,7 @@ import {
   StyleSheet, Alert, ScrollView
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { colors, spacing, fonts, radius } from '../../styles/theme';
+import { colors, spacing, fonts } from '../../styles/theme';
 import { authService } from '../../utils/authService';
 import { storageService } from '../../utils/storageService';
 import { useAuth } from '../../contexts/AuthContext';
@@ -31,12 +31,26 @@ export default function CompleteProfileScreen({ route }) {
       Alert.alert('Required', 'Please enter your full name.');
       return;
     }
+
+    if (formData.phone.trim()) {
+      const cleaned = formData.phone.replace(/\s/g, '');
+      const saMobile = /^0[678][0-9]{8}$/;
+      if (!saMobile.test(cleaned)) {
+        Alert.alert(
+          'Invalid Number',
+          'Please enter a valid South African mobile number (e.g. 082 123 4567).'
+        );
+        return;
+      }
+    }
+
     if (!formData.city.trim()) {
       Alert.alert('Required', 'Please enter your city.');
       return;
     }
-    if (!formData.province) {
-      Alert.alert('Required', 'Please select your province.');
+
+    if (!formData.province.trim()) {
+      Alert.alert('Required', 'Please enter your province.');
       return;
     }
 
@@ -46,7 +60,7 @@ export default function CompleteProfileScreen({ route }) {
         full_name: formData.full_name.trim(),
         phone: formData.phone.trim(),
         city: formData.city.trim(),
-        province: formData.province,
+        province: formData.province.trim(),
         is_profile_complete: true,
         updated_at: new Date().toISOString(),
       });
@@ -60,11 +74,10 @@ export default function CompleteProfileScreen({ route }) {
         full_name: formData.full_name.trim(),
         phone: formData.phone.trim(),
         city: formData.city.trim(),
-        province: formData.province,
+        province: formData.province.trim(),
         is_profile_complete: true,
       });
 
-      // AuthContext handles navigation automatically
       await refreshProfile();
 
     } catch (error) {
@@ -113,13 +126,14 @@ export default function CompleteProfileScreen({ route }) {
         />
 
         <LocationField
-  city={formData.city}
-  province={formData.province}
-  onCityChange={(v) => updateField('city', v)}
-  onProvinceChange={(v) => updateField('province', v)}
-/>
-
-        
+          city={formData.city}
+          province={formData.province}
+          onCityChange={(v) => updateField('city', v)}
+          onProvinceChange={(v) => updateField('province', v)}
+          onBothChange={(city, province) => {
+            setFormData(prev => ({ ...prev, city, province }));
+          }}
+        />
 
         <TouchableOpacity
           style={[styles.submitBtn, loading && styles.submitBtnDisabled]}
@@ -151,7 +165,7 @@ const styles = StyleSheet.create({
   scroll: { padding: spacing.lg, paddingTop: spacing.xl },
   roleBadge: {
     backgroundColor: colors.primaryLight,
-    borderRadius: radius.round,
+    borderRadius: 999,
     paddingVertical: spacing.xs,
     paddingHorizontal: spacing.md,
     alignSelf: 'center',
@@ -177,28 +191,17 @@ const styles = StyleSheet.create({
   input: {
     borderWidth: 1,
     borderColor: colors.border,
-    borderRadius: radius.md,
+    borderRadius: 8,
     padding: spacing.md,
     fontSize: fonts.body,
     color: colors.dark,
     backgroundColor: colors.lightGrey,
     marginBottom: spacing.lg,
   },
-  pickerWrapper: {
-    borderWidth: 1,
-    borderColor: colors.border,
-    borderRadius: radius.md,
-    backgroundColor: colors.lightGrey,
-    marginBottom: spacing.lg,
-    overflow: 'hidden',
-  },
-  picker: {
-    color: colors.dark,
-  },
   submitBtn: {
     backgroundColor: colors.primary,
     padding: spacing.md,
-    borderRadius: radius.md,
+    borderRadius: 8,
     alignItems: 'center',
     marginTop: spacing.sm,
   },
