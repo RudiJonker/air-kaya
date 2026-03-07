@@ -162,16 +162,24 @@ export default function DashboardScreen({ navigation }) {
     <SafeAreaView style={styles.safe}>
       {/* Header */}
       <View style={styles.header}>
-        <View>
-          <Text style={styles.headerGreeting}>
-            Hi, {profile?.full_name?.split(' ')[0] || 'Landlord'} 👋
-          </Text>
-          <Text style={styles.headerSub}>Manage your listings</Text>
-        </View>
-        <TouchableOpacity onPress={handleSignOut}>
-          <Text style={styles.signOutText}>Sign Out</Text>
-        </TouchableOpacity>
-      </View>
+  <View>
+    <Text style={styles.headerGreeting}>
+      Hi, {profile?.full_name?.split(' ')[0] || 'Landlord'} 👋
+    </Text>
+    <Text style={styles.headerSub}>Manage your listings</Text>
+  </View>
+  <View style={styles.headerActions}>
+    <TouchableOpacity
+      onPress={() => navigation.navigate('Profile')}
+      style={styles.profileBtn}
+    >
+      <Text style={styles.profileBtnText}>👤</Text>
+    </TouchableOpacity>
+    <TouchableOpacity onPress={handleSignOut}>
+      <Text style={styles.signOutText}>Sign Out</Text>
+    </TouchableOpacity>
+  </View>
+</View>
 
       {/* Stats */}
       <View style={styles.statsRow}>
@@ -382,4 +390,19 @@ const styles = StyleSheet.create({
     color: colors.grey,
     textAlign: 'center',
   },
+  headerActions: {
+  alignItems: 'flex-end',
+  gap: spacing.xs,
+},
+profileBtn: {
+  backgroundColor: colors.primaryDark,
+  borderRadius: 999,
+  width: 36,
+  height: 36,
+  alignItems: 'center',
+  justifyContent: 'center',
+},
+profileBtnText: {
+  fontSize: 18,
+},
 });

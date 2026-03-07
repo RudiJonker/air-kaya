@@ -1,109 +1,118 @@
 import React, { useState } from 'react';
 import {
   View, Text, TextInput, TouchableOpacity,
-  StyleSheet, Alert, ScrollView
+  StyleSheet, Alert, KeyboardAvoidingView,
+  Platform, ScrollView
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { colors, spacing, fonts, radius } from '../../styles/theme';
+import { colors, spacing, fonts } from '../../styles/theme';
 import { authService } from '../../utils/authService';
-import { storageService } from '../../utils/storageService';
 
 export default function LoginScreen({ navigation }) {
-  const [formData, setFormData] = useState({ email: '', password: '' });
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
-
-  const updateField = (field, value) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
-  };
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleLogin = async () => {
-  if (!formData.email || !formData.password) {
-    Alert.alert('Missing Fields', 'Please enter your email and password.');
-    return;
-  }
+    if (!email.trim()) {
+      Alert.alert('Required', 'Please enter your email address.');
+      return;
+    }
+    if (!password.trim()) {
+      Alert.alert('Required', 'Please enter your password.');
+      return;
+    }
 
-  setLoading(true);
-  try {
-    const { data, error } = await authService.signIn(formData.email, formData.password);
-    if (error) throw error;
-    // AppNavigator handles routing automatically via AuthContext
-  } catch (error) {
-    console.error('Login error:', error);
-    Alert.alert('Login Failed', 'Incorrect email or password. Please try again.');
-  } finally {
-    setLoading(false);
-  }
-};
+    setLoading(true);
+    try {
+      const { error } = await authService.signIn(email.trim().toLowerCase(), password);
+      if (error) throw error;
+      // AuthContext handles navigation automatically
+    } catch (error) {
+      console.error('Login error:', error);
+      Alert.alert('Login Failed', 'Incorrect email or password. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <SafeAreaView style={styles.safe}>
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
-          <Text style={styles.backText}>← Back</Text>
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Log In</Text>
-        <View style={{ width: 60 }} />
-      </View>
-
-      <ScrollView contentContainerStyle={styles.scroll}>
-        <View style={styles.logoBlock}>
-          <Text style={styles.logoEmoji}>🏠</Text>
-          <Text style={styles.logoText}>AIR KAYA</Text>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        style={styles.flex}
+      >
+        <View style={styles.header}>
+          <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
+            <Text style={styles.backText}>← Back</Text>
+          </TouchableOpacity>
+          <Text style={styles.headerTitle}>Sign In</Text>
+          <View style={{ width: 60 }} />
         </View>
 
-        <Text style={styles.label}>Email Address</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="your@email.com"
-          placeholderTextColor={colors.border}
-          value={formData.email}
-          onChangeText={(v) => updateField('email', v)}
-          autoCapitalize="none"
-          keyboardType="email-address"
-          autoComplete="email"
-        />
+        <ScrollView contentContainerStyle={styles.scroll}>
+          <Text style={styles.emoji}>👋</Text>
+          <Text style={styles.title}>Welcome back!</Text>
+          <Text style={styles.subtitle}>Sign in to your Air Kaya account.</Text>
 
-        <Text style={styles.label}>Password</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Your password"
-          placeholderTextColor={colors.border}
-          value={formData.password}
-          onChangeText={(v) => updateField('password', v)}
-          secureTextEntry
-          autoComplete="password"
-        />
+          <Text style={styles.label}>Email Address</Text>
+          <TextInput
+            style={styles.input}
+            value={email}
+            onChangeText={setEmail}
+            placeholder="your@email.com"
+            placeholderTextColor={colors.border}
+            keyboardType="email-address"
+            autoCapitalize="none"
+            autoCorrect={false}
+          />
 
-        <TouchableOpacity
-          style={styles.forgotBtn}
-          onPress={() => navigation.navigate('ForgotPassword')}
-        >
-          <Text style={styles.forgotBtnText}>Forgot your password?</Text>
-        </TouchableOpacity>
+          <Text style={styles.label}>Password</Text>
+          <View style={styles.inputRow}>
+            <TextInput
+              style={styles.inputFlex}
+              value={password}
+              onChangeText={setPassword}
+              placeholder="Your password"
+              placeholderTextColor={colors.border}
+              secureTextEntry={!showPassword}
+              autoCapitalize="none"
+            />
+            <TouchableOpacity
+              onPress={() => setShowPassword(!showPassword)}
+              style={styles.eyeBtn}
+            >
+              <Text>{showPassword ? '🙈' : '👁️'}</Text>
+            </TouchableOpacity>
+          </View>
 
-        <TouchableOpacity
-          style={[styles.loginBtn, loading && styles.loginBtnDisabled]}
-          onPress={handleLogin}
-          disabled={loading}
-        >
-          <Text style={styles.loginBtnText}>
-            {loading ? 'Logging In...' : 'Log In'}
-          </Text>
-        </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.forgotBtn}
+            onPress={() => navigation.navigate('ForgotPassword')}
+          >
+            <Text style={styles.forgotBtnText}>Forgot your password?</Text>
+          </TouchableOpacity>
 
-        <TouchableOpacity
-          style={styles.signupLink}
-          onPress={() => navigation.navigate('Welcome')}
-        >
-          <Text style={styles.signupLinkText}>Don't have an account? Sign Up</Text>
-        </TouchableOpacity>
-      </ScrollView>
+          <TouchableOpacity
+            style={[styles.loginBtn, loading && styles.loginBtnDisabled]}
+            onPress={handleLogin}
+            disabled={loading}
+          >
+            <Text style={styles.loginBtnText}>
+              {loading ? 'Signing in...' : 'Sign In'}
+            </Text>
+          </TouchableOpacity>
+
+        </ScrollView>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: colors.white },
+  flex: { flex: 1 },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -115,43 +124,83 @@ const styles = StyleSheet.create({
   backBtn: { width: 60 },
   backText: { color: colors.white, fontSize: fonts.body },
   headerTitle: { fontSize: fonts.large, fontWeight: 'bold', color: colors.white },
-  scroll: { padding: spacing.lg, paddingTop: spacing.xl },
-  logoBlock: { alignItems: 'center', marginBottom: spacing.xl },
-  logoEmoji: { fontSize: 48, marginBottom: spacing.xs },
-  logoText: {
-    fontSize: fonts.xxlarge,
+  scroll: {
+    padding: spacing.xl,
+    alignItems: 'center',
+    flexGrow: 1,
+    justifyContent: 'center',
+  },
+  emoji: { fontSize: 64, marginBottom: spacing.lg },
+  title: {
+    fontSize: fonts.xlarge,
     fontWeight: 'bold',
-    color: colors.primary,
-    letterSpacing: 4,
+    color: colors.dark,
+    marginBottom: spacing.sm,
+    textAlign: 'center',
+  },
+  subtitle: {
+    fontSize: fonts.body,
+    color: colors.grey,
+    textAlign: 'center',
+    marginBottom: spacing.xl,
   },
   label: {
     fontSize: fonts.body,
     fontWeight: '600',
     color: colors.dark,
     marginBottom: spacing.xs,
+    alignSelf: 'flex-start',
+    width: '100%',
   },
   input: {
     borderWidth: 1,
     borderColor: colors.border,
-    borderRadius: radius.md,
+    borderRadius: 8,
     padding: spacing.md,
     fontSize: fonts.body,
     color: colors.dark,
     backgroundColor: colors.lightGrey,
     marginBottom: spacing.lg,
+    width: '100%',
   },
+  inputRow: {
+    flexDirection: 'row',
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderRadius: 8,
+    backgroundColor: colors.lightGrey,
+    marginBottom: spacing.sm,
+    width: '100%',
+    alignItems: 'center',
+  },
+  inputFlex: {
+    flex: 1,
+    padding: spacing.md,
+    fontSize: fonts.body,
+    color: colors.dark,
+  },
+  eyeBtn: { padding: spacing.md },
   forgotBtn: {
-  marginTop: spacing.sm,
-  alignItems: 'center',
-  padding: spacing.sm,
-},
-forgotBtnText: {
-  color: colors.primary,
-  fontSize: fonts.body,
-  fontWeight: '600',
-},
+    alignSelf: 'flex-end',
+    padding: spacing.sm,
+    marginBottom: spacing.lg,
+  },
+  forgotBtnText: {
+    color: colors.primary,
+    fontSize: fonts.body,
+    fontWeight: '600',
+  },
+  loginBtn: {
+    backgroundColor: colors.primary,
+    padding: spacing.md,
+    borderRadius: 8,
+    alignItems: 'center',
+    width: '100%',
+  },
   loginBtnDisabled: { backgroundColor: colors.border },
-  loginBtnText: { color: colors.white, fontSize: fonts.medium, fontWeight: 'bold' },
-  signupLink: { alignItems: 'center' },
-  signupLinkText: { color: colors.primary, fontSize: fonts.body, fontWeight: '600' },
+  loginBtnText: {
+    color: colors.white,
+    fontSize: fonts.medium,
+    fontWeight: 'bold',
+  },
 });
