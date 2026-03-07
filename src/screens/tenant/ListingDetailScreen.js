@@ -78,7 +78,7 @@ export default function ListingDetailScreen({ navigation, route }) {
   };
 
   return (
-    <SafeAreaView style={styles.safe}>
+    <SafeAreaView style={styles.safe} edges={['top', 'left', 'right', 'bottom']}>
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
@@ -225,7 +225,7 @@ export default function ListingDetailScreen({ navigation, route }) {
             </>
           )}
 
-          <View style={{ height: spacing.xxl }} />
+          <View style={{ height: 100 }} />
 
         </View>
       </ScrollView>
@@ -238,20 +238,20 @@ export default function ListingDetailScreen({ navigation, route }) {
                 style={[styles.contactBtn, styles.contactBtnWhatsApp]}
                 onPress={handleWhatsApp}
               >
-                <Text style={styles.contactBtnText}>💬 WhatsApp</Text>
+                <Text style={[styles.contactBtnText, { color: '#FFFFFF' }]}>💬 WhatsApp</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 style={[styles.contactBtn, styles.contactBtnCall]}
                 onPress={handleCall}
               >
-                <Text style={styles.contactBtnText}>📞 Call</Text>
+                <Text style={[styles.contactBtnText, { color: '#FFFFFF' }]}>📞 Call</Text>
               </TouchableOpacity>
             </View>
           : <TouchableOpacity
               style={[styles.contactBtn, styles.contactBtnFull]}
               onPress={handleContact}
             >
-              <Text style={styles.contactBtnText}>
+              <Text style={[styles.contactBtnText, { color: '#FFFFFF' }]}>
                 {listing.contact_pref === 'whatsapp' ? '💬 WhatsApp Landlord' : '📞 Call Landlord'}
               </Text>
             </TouchableOpacity>
@@ -413,6 +413,7 @@ const styles = StyleSheet.create({
   contactBar: {
     backgroundColor: colors.white,
     padding: spacing.md,
+    paddingBottom: spacing.xl,
     borderTopWidth: 1,
     borderTopColor: colors.border,
   },
@@ -422,9 +423,11 @@ const styles = StyleSheet.create({
   },
   contactBtn: {
     flex: 1,
-    padding: spacing.md,
+    padding: spacing.sm,
     borderRadius: 8,
     alignItems: 'center',
+    justifyContent: 'center',
+    minHeight: 56,
   },
   contactBtnFull: {
     backgroundColor: colors.primary,
