@@ -33,8 +33,15 @@ export default function AppNavigator() {
 
   }
 
-  // Logged in but profile incomplete — go to CompleteProfile
+  // Logged in but profile incomplete — wait for role to load
   if (!profile?.is_profile_complete) {
+    if (!profile?.role) {
+      return (
+        <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.primary }}>
+          <ActivityIndicator size="large" color={colors.white} />
+        </View>
+      );
+    }
     return (
       <Stack.Navigator screenOptions={{ headerShown: false }}>
         <Stack.Screen
@@ -43,7 +50,7 @@ export default function AppNavigator() {
           initialParams={{
             userId: user.id,
             email: user.email,
-            role: profile?.role,
+            role: profile.role,
           }}
         />
       </Stack.Navigator>

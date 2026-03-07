@@ -13,7 +13,9 @@ import LocationField from '../../components/common/LocationField';
 
 export default function CompleteProfileScreen({ route }) {
   const { refreshProfile } = useAuth();
+  
   const { userId, email, role } = route.params;
+  
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     full_name: '',

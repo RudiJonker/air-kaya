@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import {
   View, Text, StyleSheet, ScrollView, Image,
-  TouchableOpacity, Linking, Alert, Dimensions
+  TouchableOpacity, Linking, Alert, Dimensions, Share
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { colors, spacing, fonts } from '../../styles/theme';
@@ -18,6 +18,20 @@ export default function ListingDetailScreen({ navigation, route }) {
         .sort((a, b) => a.order_index - b.order_index)
         .map(img => img.url)
     : [];
+
+const handleShare = async () => {
+  try {
+    await Share.share({
+      message:
+        `🏡 Check out this ${getTypeLabel(listing.type)} on Air Kaya!\n\n` +
+        `📍 ${listing.city}, ${listing.province}\n` +
+        `💰 R${listing.price_amount}/${listing.price_period === 'monthly' ? 'month' : 'week'}\n\n` +
+        `Download Air Kaya to find affordable accommodation across South Africa.`,
+    });
+  } catch (error) {
+    console.error('Share error:', error);
+  }
+};
 
   const getTypeLabel = (value) => {
     const found = ACCOMMODATION_TYPES.find(t => t.value === value);
@@ -81,12 +95,14 @@ export default function ListingDetailScreen({ navigation, route }) {
     <SafeAreaView style={styles.safe} edges={['top', 'left', 'right', 'bottom']}>
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
-          <Text style={styles.backText}>← Back</Text>
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>{getTypeLabel(listing.type)}</Text>
-        <View style={{ width: 60 }} />
-      </View>
+  <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
+    <Text style={styles.backText}>← Back</Text>
+  </TouchableOpacity>
+  <Text style={styles.headerTitle}>{getTypeLabel(listing.type)}</Text>
+  <TouchableOpacity onPress={handleShare} style={styles.shareBtn}>
+    <Text style={styles.shareBtnText}>Share</Text>
+  </TouchableOpacity>
+</View>
 
       <ScrollView showsVerticalScrollIndicator={false}>
 
@@ -443,4 +459,13 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     fontSize: fonts.medium,
   },
+  shareBtn: {
+  width: 60,
+  alignItems: 'flex-end',
+},
+shareBtnText: {
+  color: colors.white,
+  fontSize: fonts.body,
+  fontWeight: '600',
+},
 });
