@@ -4,9 +4,9 @@ import {
   ActivityIndicator, TextInput, Alert, StyleSheet
 } from 'react-native';
 import * as Location from 'expo-location';
-import { colors, spacing, fonts, radius } from '../../styles/theme';
+import { colors, spacing, fonts } from '../../styles/theme';
 
-export default function LocationField({ city, province, onCityChange, onProvinceChange }) {
+export default function LocationField({ city, province, onCityChange, onProvinceChange, onBothChange, helpText = 'This helps show relevant listings in your area.' }) {
   const [loading, setLoading] = useState(false);
 
   const getCurrentLocation = async () => {
@@ -31,15 +31,27 @@ export default function LocationField({ city, province, onCityChange, onProvince
       });
 
       if (geocode.length > 0) {
-        const { city: detectedCity, region } = geocode[0];
-        if (detectedCity) onCityChange(detectedCity);
-        if (region) onProvinceChange(region);
+        console.log('📍 Full geocode result:', JSON.stringify(geocode[0]));
 
-        if (detectedCity || region) {
-          Alert.alert('Location Detected', `City: ${detectedCity || '—'}\nProvince: ${region || '—'}`);
+        const { city: geoCity, subregion, district, region } = geocode[0];
+        const detectedCity = geoCity || subregion || district;
+        const detectedProvince = region;
+
+        // Update both fields in one call to avoid stale closure
+        if (onBothChange) {
+          onBothChange(detectedCity || '', detectedProvince || '');
         } else {
-          Alert.alert('Not Found', 'Could not detect your location. Please enter manually.');
+          if (detectedCity) onCityChange(detectedCity);
+          if (detectedProvince) onProvinceChange(detectedProvince);
         }
+
+        setTimeout(() => {
+          if (detectedCity || detectedProvince) {
+            Alert.alert('Location Detected', `City: ${detectedCity || '—'}\nProvince: ${detectedProvince || '—'}`);
+          } else {
+            Alert.alert('Not Found', 'Could not detect your location. Please enter manually.');
+          }
+        }, 500);
       }
     } catch (error) {
       console.error('Location error:', error);
@@ -80,6 +92,8 @@ export default function LocationField({ city, province, onCityChange, onProvince
         placeholderTextColor={colors.border}
         autoCapitalize="words"
       />
+
+      <Text style={styles.helpText}>{helpText}</Text>
     </View>
   );
 }
@@ -110,11 +124,17 @@ const styles = StyleSheet.create({
   input: {
     borderWidth: 1,
     borderColor: colors.border,
-    borderRadius: radius.md,
+    borderRadius: 8,
     padding: spacing.md,
     fontSize: fonts.body,
     color: colors.dark,
     backgroundColor: colors.lightGrey,
+    marginBottom: spacing.lg,
+  },
+  helpText: {
+    fontSize: fonts.small,
+    color: colors.grey,
+    fontStyle: 'italic',
     marginBottom: spacing.lg,
   },
 });

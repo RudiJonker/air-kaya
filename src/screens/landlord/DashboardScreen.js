@@ -19,6 +19,12 @@ export default function DashboardScreen({ navigation }) {
       </View>
       <View style={styles.body}>
         <Text style={styles.placeholder}>Listings will appear here.</Text>
+        <TouchableOpacity
+  style={styles.addBtn}
+  onPress={() => navigation.navigate('CreateListing')}
+>
+  <Text style={styles.addBtnText}>+ Add New Listing</Text>
+</TouchableOpacity>
         <TouchableOpacity style={styles.signOutBtn} onPress={handleSignOut}>
           <Text style={styles.signOutText}>Sign Out</Text>
         </TouchableOpacity>
@@ -61,4 +67,17 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     fontSize: fonts.body,
   },
+
+  addBtn: {
+  backgroundColor: colors.primary,
+  paddingVertical: spacing.sm,
+  paddingHorizontal: spacing.xl,
+  borderRadius: 8,
+  marginBottom: spacing.md,
+},
+addBtnText: {
+  color: colors.white,
+  fontWeight: '600',
+  fontSize: fonts.body,
+},
 });
