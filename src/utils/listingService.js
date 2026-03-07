@@ -1,4 +1,5 @@
 import { supabase } from '../config/supabase';
+import * as FileSystem from 'expo-file-system/legacy';
 
 export const listingService = {
 
@@ -61,12 +62,21 @@ export const listingService = {
       const fileName = `${listingId}/${index}_${Date.now()}.${ext}`;
       const contentType = `image/${ext === 'jpg' ? 'jpeg' : ext}`;
 
-      const response = await fetch(imageUri);
-      const blob = await response.blob();
+      // Read as base64 instead of fetch/blob (works in Expo Go on Android)
+      const base64 = await FileSystem.readAsStringAsync(imageUri, {
+        encoding: FileSystem.EncodingType.Base64,
+      });
+
+      // Convert base64 to Uint8Array
+      const binaryString = atob(base64);
+      const bytes = new Uint8Array(binaryString.length);
+      for (let i = 0; i < binaryString.length; i++) {
+        bytes[i] = binaryString.charCodeAt(i);
+      }
 
       const { error: uploadError } = await supabase.storage
         .from('listing-images')
-        .upload(fileName, blob, { contentType, upsert: true });
+        .upload(fileName, bytes, { contentType, upsert: true });
 
       if (uploadError) throw uploadError;
 
