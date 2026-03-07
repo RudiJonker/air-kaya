@@ -1,7 +1,8 @@
 import React, { useState, useCallback } from 'react';
 import {
   View, Text, StyleSheet, TouchableOpacity,
-  FlatList, Image, Alert, ActivityIndicator
+  FlatList, Image, Alert, ActivityIndicator,
+  RefreshControl
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFocusEffect } from '@react-navigation/native';
@@ -16,6 +17,7 @@ export default function DashboardScreen({ navigation }) {
   const { user, profile } = useAuth();
   const [listings, setListings] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
 
   // Reload listings every time screen comes into focus
   useFocusEffect(
@@ -23,6 +25,12 @@ export default function DashboardScreen({ navigation }) {
       loadListings();
     }, [])
   );
+
+  const handleRefresh = async () => {
+  setRefreshing(true);
+  await loadListings();
+  setRefreshing(false);
+};
 
   const loadListings = async () => {
     setLoading(true);
@@ -215,12 +223,20 @@ export default function DashboardScreen({ navigation }) {
               <Text style={styles.emptySubtitle}>Tap the button above to add your first listing.</Text>
             </View>
           : <FlatList
-              data={listings}
-              keyExtractor={(item) => item.id}
-              renderItem={renderListing}
-              contentContainerStyle={styles.listContent}
-              showsVerticalScrollIndicator={false}
-            />
+  data={listings}
+  keyExtractor={(item) => item.id}
+  renderItem={renderListing}
+  contentContainerStyle={styles.listContent}
+  showsVerticalScrollIndicator={false}
+  refreshControl={
+    <RefreshControl
+      refreshing={refreshing}
+      onRefresh={handleRefresh}
+      colors={[colors.primary]}
+      tintColor={colors.primary}
+    />
+  }
+/>
       }
     </SafeAreaView>
   );

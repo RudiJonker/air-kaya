@@ -1,7 +1,8 @@
 import React, { useState, useCallback } from 'react';
 import {
   View, Text, StyleSheet, FlatList, Image,
-  TouchableOpacity, TextInput, ActivityIndicator, Alert
+  TouchableOpacity, TextInput, ActivityIndicator,
+  Alert, RefreshControl
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFocusEffect } from '@react-navigation/native';
@@ -17,12 +18,19 @@ export default function BrowseScreen({ navigation }) {
   const [listings, setListings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchCity, setSearchCity] = useState(profile?.city || '');
+  const [refreshing, setRefreshing] = useState(false);
 
   useFocusEffect(
     useCallback(() => {
       loadListings();
     }, [])
   );
+
+  const handleRefresh = async () => {
+  setRefreshing(true);
+  await loadListings(searchCity);
+  setRefreshing(false);
+};
 
   const loadListings = async (city = searchCity) => {
     setLoading(true);
@@ -184,12 +192,20 @@ export default function BrowseScreen({ navigation }) {
               </TouchableOpacity>
             </View>
           : <FlatList
-              data={listings}
-              keyExtractor={(item) => item.id}
-              renderItem={renderListing}
-              contentContainerStyle={styles.listContent}
-              showsVerticalScrollIndicator={false}
-            />
+  data={listings}
+  keyExtractor={(item) => item.id}
+  renderItem={renderListing}
+  contentContainerStyle={styles.listContent}
+  showsVerticalScrollIndicator={false}
+  refreshControl={
+    <RefreshControl
+      refreshing={refreshing}
+      onRefresh={handleRefresh}
+      colors={[colors.primary]}
+      tintColor={colors.primary}
+    />
+  }
+/>
       }
     </SafeAreaView>
   );
