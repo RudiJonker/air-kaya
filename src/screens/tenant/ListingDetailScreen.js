@@ -6,6 +6,8 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { colors, spacing, fonts } from '../../styles/theme';
 import { ACCOMMODATION_TYPES, UTILITIES, AMENITIES, LEASE_PERIODS } from '../../constants/listing';
+import { BannerAd, BannerAdSize, TestIds } from 'react-native-google-mobile-ads';
+import { AD_UNIT_ID } from '../../config/admob';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -102,6 +104,17 @@ const handleShare = async () => {
   <TouchableOpacity onPress={handleShare} style={styles.shareBtn}>
     <Text style={styles.shareBtnText}>Share</Text>
   </TouchableOpacity>
+</View>
+
+{/* Ad Banner */}
+<View style={styles.adContainer}>
+  <BannerAd
+    unitId={AD_UNIT_ID}
+    size={BannerAdSize.BANNER}
+    requestOptions={{
+      requestNonPersonalizedAdsOnly: true,
+    }}
+  />
 </View>
 
       <ScrollView showsVerticalScrollIndicator={false}>
@@ -467,5 +480,11 @@ shareBtnText: {
   color: colors.white,
   fontSize: fonts.body,
   fontWeight: '600',
+},
+adContainer: {
+  alignItems: 'center',
+  backgroundColor: colors.lightGrey,
+  borderBottomWidth: 1,
+  borderBottomColor: colors.border,
 },
 });
