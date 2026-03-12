@@ -1,11 +1,12 @@
 import React from 'react';
 import {
   View, Text, TextInput, TouchableOpacity,
-  StyleSheet, Alert, ScrollView
+  StyleSheet, Alert, ScrollView, Image
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { colors, spacing, fonts, radius } from '../../styles/theme';
+
 
 export default function WelcomeScreen({ navigation }) {
   const handleRoleSelect = (role) => {
@@ -17,11 +18,14 @@ export default function WelcomeScreen({ navigation }) {
       <StatusBar barStyle="light-content" backgroundColor={colors.primary} />
 
       {/* Green header block */}
-      <View style={styles.header}>
-        <Text style={styles.emoji}>🏠</Text>
-        <Text style={styles.appName}>AIR KAYA</Text>
-        <Text style={styles.tagline}>Find or list informal accommodation</Text>
-      </View>
+<View style={styles.header}>
+  <Image
+    source={require('../../../assets/logo.png')}
+    style={styles.logoImage}
+    resizeMode="stretch"
+  />
+  <Text style={styles.tagline}>Find or list informal accommodation</Text>
+</View>
 
       {/* White card body */}
       <View style={styles.body}>
@@ -81,9 +85,15 @@ const styles = StyleSheet.create({
   },
   header: {
   backgroundColor: colors.primary,
+  paddingTop: spacing.xl,
+  paddingBottom: spacing.md,
   alignItems: 'center',
-  paddingTop: spacing.md,        // was spacing.xl
-  paddingBottom: spacing.lg,     // was spacing.xl
+  justifyContent: 'center',
+},
+logoImage: {
+  width: '50%',
+  height:50,
+  marginBottom: spacing.sm,
 },
 emoji: {
   fontSize: 48,                  // was 56
@@ -96,7 +106,7 @@ appName: {
   letterSpacing: 4,
 },
 tagline: {
-  fontSize: fonts.small,         // was fonts.body
+  fontSize: fonts.medium,         // was fonts.body
   color: colors.primaryMid,
   marginTop: spacing.xs,
   letterSpacing: 0.5,
@@ -183,4 +193,5 @@ chooseLabel: {
     fontWeight: '700',
     color: colors.primary,
   },
+  
 });
