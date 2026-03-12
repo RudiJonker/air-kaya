@@ -4,11 +4,12 @@ import {
   StyleSheet, Alert, ScrollView
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { colors, spacing, fonts, radius } from '../../styles/theme';
+import { colors, spacing, fonts } from '../../styles/theme';
 import { authService } from '../../utils/authService';
-import { storageService } from '../../utils/storageService';
+import { useAuth } from '../../contexts/AuthContext';
 
 export default function SignUpScreen({ navigation, route }) {
+  const { refreshProfile } = useAuth();
   const { role } = route.params;
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
@@ -22,50 +23,55 @@ export default function SignUpScreen({ navigation, route }) {
   };
 
   const handleSignUp = async () => {
-  if (!formData.email || !formData.password || !formData.confirmPassword) {
-    Alert.alert('Missing Fields', 'Please fill in all fields.');
-    return;
-  }
-  if (formData.password !== formData.confirmPassword) {
-    Alert.alert('Password Mismatch', 'Your passwords do not match.');
-    return;
-  }
-  if (formData.password.length < 6) {
-    Alert.alert('Weak Password', 'Password must be at least 6 characters.');
-    return;
-  }
-
-  setLoading(true);
-  try {
-    const { data: authData, error: authError } = await authService.signUp(
-      formData.email,
-      formData.password
-    );
-    if (authError) throw authError;
-
-    if (authData.user) {
-      const { error: profileError } = await authService.createProfile({
-        id: authData.user.id,
-        email: formData.email,
-        role: role,
-        is_profile_complete: false,
-        created_at: new Date().toISOString(),
-      });
-      if (profileError) throw profileError;
-
-      // AuthContext handles navigation automatically
+    if (!formData.email || !formData.password || !formData.confirmPassword) {
+      Alert.alert('Missing Fields', 'Please fill in all fields.');
+      return;
     }
-  } catch (error) {
-    console.error('Sign up error:', error);
-    if (error.message?.includes('already registered')) {
-      Alert.alert('Already Registered', 'This email is already in use. Please log in instead.');
-    } else {
-      Alert.alert('Sign Up Failed', 'Something went wrong. Please try again.');
+    if (formData.password !== formData.confirmPassword) {
+      Alert.alert('Password Mismatch', 'Your passwords do not match.');
+      return;
     }
-  } finally {
-    setLoading(false);
-  }
-};
+    if (formData.password.length < 6) {
+      Alert.alert('Weak Password', 'Password must be at least 6 characters.');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const { data: authData, error: authError } = await authService.signUp(
+        formData.email,
+        formData.password
+      );
+      if (authError) throw authError;
+
+      if (authData.user) {
+        const { error: profileError } = await authService.createProfile({
+          id: authData.user.id,
+          email: formData.email,
+          role: role,
+          is_profile_complete: false,
+          created_at: new Date().toISOString(),
+        });
+        if (profileError) throw profileError;
+
+        // Wait for profile to be committed to the database
+        await new Promise(resolve => setTimeout(resolve, 800));
+
+        // Refresh profile with the new user ID to trigger navigation
+        await refreshProfile(authData.user.id);
+      }
+
+    } catch (error) {
+      console.error('Sign up error:', error);
+      if (error.message?.includes('already registered')) {
+        Alert.alert('Already Registered', 'This email is already in use. Please log in instead.');
+      } else {
+        Alert.alert('Sign Up Failed', 'Something went wrong. Please try again.');
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const roleLabel = role === 'landlord' ? 'Landlord 🏡' : 'Tenant 🔍';
 
@@ -153,7 +159,7 @@ const styles = StyleSheet.create({
   scroll: { padding: spacing.lg, paddingTop: spacing.xl },
   roleBadge: {
     backgroundColor: colors.primaryLight,
-    borderRadius: radius.round,
+    borderRadius: 999,
     paddingVertical: spacing.xs,
     paddingHorizontal: spacing.md,
     alignSelf: 'center',
@@ -173,7 +179,7 @@ const styles = StyleSheet.create({
   input: {
     borderWidth: 1,
     borderColor: colors.border,
-    borderRadius: radius.md,
+    borderRadius: 8,
     padding: spacing.md,
     fontSize: fonts.body,
     color: colors.dark,
@@ -183,7 +189,7 @@ const styles = StyleSheet.create({
   submitBtn: {
     backgroundColor: colors.primary,
     padding: spacing.md,
-    borderRadius: radius.md,
+    borderRadius: 8,
     alignItems: 'center',
     marginTop: spacing.sm,
     marginBottom: spacing.lg,
