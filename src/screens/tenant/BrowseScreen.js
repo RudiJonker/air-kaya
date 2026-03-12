@@ -12,6 +12,9 @@ import { authService } from '../../utils/authService';
 import { storageService } from '../../utils/storageService';
 import { listingService } from '../../utils/listingService';
 import { ACCOMMODATION_TYPES } from '../../constants/listing';
+import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
+import CityAutocomplete from '../../components/common/CityAutocomplete';
+
 
 export default function BrowseScreen({ navigation }) {
   const { user, profile } = useAuth();
@@ -19,12 +22,15 @@ export default function BrowseScreen({ navigation }) {
   const [loading, setLoading] = useState(true);
   const [searchCity, setSearchCity] = useState(profile?.city || '');
   const [refreshing, setRefreshing] = useState(false);
+  
 
   useFocusEffect(
-    useCallback(() => {
-      loadListings();
-    }, [])
-  );
+  useCallback(() => {
+    loadListings(searchCity);
+  }, [searchCity])
+);
+
+
 
   const handleRefresh = async () => {
   setRefreshing(true);
@@ -122,42 +128,43 @@ export default function BrowseScreen({ navigation }) {
   return (
     <SafeAreaView style={styles.safe}>
       {/* Header */}
-      <View style={styles.header}>
-  <View>
+<View style={styles.header}>
+  <View style={styles.headerLeft}>
     <Text style={styles.headerGreeting}>
-      Hi, {profile?.full_name?.split(' ')[0] || 'Landlord'} 👋
+      Hi, {profile?.full_name?.split(' ')[0] || 'there'} 👋
     </Text>
-    <Text style={styles.headerSub}>Manage your listings</Text>
+    <Text style={styles.headerSub}>Find your next home</Text>
   </View>
-  <View style={styles.headerActions}>
-    <TouchableOpacity
-      onPress={() => navigation.navigate('Profile')}
-      style={styles.profileBtn}
-    >
-      <Text style={styles.profileBtnText}>👤</Text>
-    </TouchableOpacity>
-    <TouchableOpacity onPress={handleSignOut}>
-      <Text style={styles.signOutText}>Sign Out</Text>
-    </TouchableOpacity>
-  </View>
+ <TouchableOpacity
+  onPress={() => navigation.navigate('Profile')}
+  style={styles.profileBtn}
+>
+  {profile?.avatar_url
+    ? <Image source={{ uri: profile.avatar_url }} style={styles.profileAvatar} />
+    : <Text style={styles.profileBtnText}>👤</Text>
+  }
+</TouchableOpacity>
+  <TouchableOpacity onPress={handleSignOut} style={styles.signOutBtn}>
+    <Text style={styles.signOutText}>Sign Out</Text>
+  </TouchableOpacity>
 </View>
 
       {/* Search Bar */}
-      <View style={styles.searchRow}>
-        <TextInput
-          style={styles.searchInput}
-          value={searchCity}
-          onChangeText={setSearchCity}
-          placeholder="Search by city..."
-          placeholderTextColor={colors.border}
-          returnKeyType="search"
-          onSubmitEditing={handleSearch}
-          autoCapitalize="words"
-        />
-        <TouchableOpacity style={styles.searchBtn} onPress={handleSearch}>
-          <Text style={styles.searchBtnText}>Search</Text>
-        </TouchableOpacity>
-      </View>
+<View style={styles.searchRow}>
+  <View style={styles.searchInputWrapper}>
+    <CityAutocomplete
+      value={searchCity}
+      placeholder="Search by city..."
+      onSelectCity={(city) => {
+        setSearchCity(city);
+        loadListings(city);
+      }}
+    />
+  </View>
+  <TouchableOpacity style={styles.searchBtn} onPress={handleSearch}>
+    <Text style={styles.searchBtnText}>Search</Text>
+  </TouchableOpacity>
+</View>
 
       {/* Results Count */}
       {!loading && (
@@ -215,25 +222,44 @@ const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: colors.lightGrey },
   header: {
     backgroundColor: colors.primary,
-    padding: spacing.md,
+    paddingTop: spacing.xl,
+    paddingBottom: spacing.md,
+    paddingHorizontal: spacing.md,
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
+    gap: spacing.md,
+  },
+  headerLeft: {
+    flex: 1,
   },
   headerGreeting: {
+    color: colors.white,
     fontSize: fonts.large,
     fontWeight: 'bold',
-    color: colors.white,
   },
   headerSub: {
+    color: colors.primaryLight,
     fontSize: fonts.small,
-    color: colors.primaryMid,
     marginTop: 2,
   },
+  signOutBtn: {
+    paddingLeft: spacing.xs,
+  },
   signOutText: {
-    fontSize: fonts.body,
-    color: colors.primaryMid,
-    fontWeight: '600',
+    color: colors.white,
+    fontSize: fonts.small,
+    opacity: 0.8,
+  },
+  profileBtn: {
+    backgroundColor: colors.primaryDark,
+    borderRadius: 999,
+    width: 36,
+    height: 36,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  profileBtnText: {
+    fontSize: 18,
   },
   searchRow: {
     flexDirection: 'row',
@@ -242,9 +268,13 @@ const styles = StyleSheet.create({
     backgroundColor: colors.white,
     borderBottomWidth: 1,
     borderBottomColor: colors.border,
+    zIndex: 10,
+  },
+  searchInputWrapper: {
+    flex: 1,
+    zIndex: 10,
   },
   searchInput: {
-    flex: 1,
     borderWidth: 1,
     borderColor: colors.border,
     borderRadius: 8,
@@ -253,6 +283,27 @@ const styles = StyleSheet.create({
     fontSize: fonts.body,
     color: colors.dark,
     backgroundColor: colors.lightGrey,
+  },
+  suggestionsBox: {
+    position: 'absolute',
+    top: 44,
+    left: 0,
+    right: 0,
+    backgroundColor: colors.white,
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderRadius: 8,
+    zIndex: 20,
+    elevation: 5,
+  },
+  suggestionRow: {
+    padding: spacing.md,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.lightGrey,
+  },
+  suggestionText: {
+    fontSize: fonts.body,
+    color: colors.dark,
   },
   searchBtn: {
     backgroundColor: colors.primary,
@@ -370,19 +421,9 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     fontSize: fonts.body,
   },
-  headerActions: {
-  alignItems: 'flex-end',
-  gap: spacing.xs,
-},
-profileBtn: {
-  backgroundColor: colors.primaryDark,
-  borderRadius: 999,
+  profileAvatar: {
   width: 36,
   height: 36,
-  alignItems: 'center',
-  justifyContent: 'center',
-},
-profileBtnText: {
-  fontSize: 18,
+  borderRadius: 999,
 },
 });

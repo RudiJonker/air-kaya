@@ -440,12 +440,12 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   contactBar: {
-    backgroundColor: colors.white,
-    padding: spacing.md,
-    paddingBottom: spacing.xl,
-    borderTopWidth: 1,
-    borderTopColor: colors.border,
-  },
+  backgroundColor: colors.white,
+  padding: spacing.md,
+  paddingBottom: spacing.xxl,
+  borderTopWidth: 1,
+  borderTopColor: colors.border,
+},
   contactBothRow: {
     flexDirection: 'row',
     gap: spacing.sm,

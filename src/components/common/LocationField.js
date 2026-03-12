@@ -5,6 +5,7 @@ import {
 } from 'react-native';
 import * as Location from 'expo-location';
 import { colors, spacing, fonts } from '../../styles/theme';
+import CityAutocomplete from './CityAutocomplete';
 
 export default function LocationField({ city, province, onCityChange, onProvinceChange, onBothChange, helpText = 'This helps show relevant listings in your area.' }) {
   const [loading, setLoading] = useState(false);
@@ -31,13 +32,10 @@ export default function LocationField({ city, province, onCityChange, onProvince
       });
 
       if (geocode.length > 0) {
-        console.log('📍 Full geocode result:', JSON.stringify(geocode[0]));
-
         const { city: geoCity, subregion, district, region } = geocode[0];
         const detectedCity = geoCity || subregion || district;
         const detectedProvince = region;
 
-        // Update both fields in one call to avoid stale closure
         if (onBothChange) {
           onBothChange(detectedCity || '', detectedProvince || '');
         } else {
@@ -62,7 +60,7 @@ export default function LocationField({ city, province, onCityChange, onProvince
   };
 
   return (
-    <View>
+    <View style={styles.container}>
       <View style={styles.headerRow}>
         <Text style={styles.sectionLabel}>Location</Text>
         <TouchableOpacity onPress={getCurrentLocation} disabled={loading}>
@@ -74,13 +72,16 @@ export default function LocationField({ city, province, onCityChange, onProvince
       </View>
 
       <Text style={styles.label}>City / Town *</Text>
-      <TextInput
-        style={styles.input}
+      <CityAutocomplete
         value={city}
-        onChangeText={onCityChange}
         placeholder="e.g. Cape Town"
-        placeholderTextColor={colors.border}
-        autoCapitalize="words"
+        onSelectCity={(selectedCity, selectedProvince) => {
+          if (selectedProvince && onBothChange) {
+            onBothChange(selectedCity, selectedProvince);
+          } else {
+            onCityChange(selectedCity);
+          }
+        }}
       />
 
       <Text style={styles.label}>Province *</Text>
@@ -99,6 +100,9 @@ export default function LocationField({ city, province, onCityChange, onProvince
 }
 
 const styles = StyleSheet.create({
+  container: {
+    zIndex: 10,
+  },
   headerRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -119,6 +123,7 @@ const styles = StyleSheet.create({
     fontSize: fonts.body,
     fontWeight: '600',
     color: colors.dark,
+    marginTop: spacing.md,
     marginBottom: spacing.xs,
   },
   input: {
@@ -128,13 +133,14 @@ const styles = StyleSheet.create({
     padding: spacing.md,
     fontSize: fonts.body,
     color: colors.dark,
-    backgroundColor: colors.lightGrey,
-    marginBottom: spacing.lg,
+    backgroundColor: colors.white,
+    marginBottom: spacing.sm,
   },
   helpText: {
     fontSize: fonts.small,
     color: colors.grey,
     fontStyle: 'italic',
+    marginTop: spacing.sm,
     marginBottom: spacing.lg,
   },
 });

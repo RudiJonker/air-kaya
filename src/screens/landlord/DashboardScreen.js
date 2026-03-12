@@ -169,24 +169,25 @@ export default function DashboardScreen({ navigation }) {
   return (
     <SafeAreaView style={styles.safe}>
       {/* Header */}
-      <View style={styles.header}>
-  <View>
+<View style={styles.header}>
+  <View style={styles.headerLeft}>
     <Text style={styles.headerGreeting}>
       Hi, {profile?.full_name?.split(' ')[0] || 'Landlord'} 👋
     </Text>
     <Text style={styles.headerSub}>Manage your listings</Text>
   </View>
-  <View style={styles.headerActions}>
-    <TouchableOpacity
-      onPress={() => navigation.navigate('Profile')}
-      style={styles.profileBtn}
-    >
-      <Text style={styles.profileBtnText}>👤</Text>
-    </TouchableOpacity>
-    <TouchableOpacity onPress={handleSignOut}>
-      <Text style={styles.signOutText}>Sign Out</Text>
-    </TouchableOpacity>
-  </View>
+  <TouchableOpacity
+  onPress={() => navigation.navigate('Profile')}
+  style={styles.profileBtn}
+>
+  {profile?.avatar_url
+    ? <Image source={{ uri: profile.avatar_url }} style={styles.profileAvatar} />
+    : <Text style={styles.profileBtnText}>👤</Text>
+  }
+</TouchableOpacity>
+  <TouchableOpacity onPress={handleSignOut} style={styles.signOutBtn}>
+    <Text style={styles.signOutText}>Sign Out</Text>
+  </TouchableOpacity>
 </View>
 
       {/* Stats */}
@@ -245,27 +246,35 @@ export default function DashboardScreen({ navigation }) {
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: colors.lightGrey },
   header: {
-    backgroundColor: colors.primary,
-    padding: spacing.md,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
+  backgroundColor: colors.primary,
+  paddingTop: spacing.xl,
+  paddingBottom: spacing.md,
+  paddingHorizontal: spacing.md,
+  flexDirection: 'row',
+  alignItems: 'center',
+  gap: spacing.md,
+},
+headerLeft: {
+  flex: 1,
+},
   headerGreeting: {
-    fontSize: fonts.large,
-    fontWeight: 'bold',
-    color: colors.white,
-  },
+  fontSize: fonts.large,
+  fontWeight: 'bold',
+  color: colors.white,
+},
   headerSub: {
-    fontSize: fonts.small,
-    color: colors.primaryMid,
-    marginTop: 2,
-  },
+  fontSize: fonts.small,
+  color: colors.primaryMid,
+  marginTop: 2,
+},
+signOutBtn: {
+  paddingLeft: spacing.xs,
+},
   signOutText: {
-    fontSize: fonts.body,
-    color: colors.primaryMid,
-    fontWeight: '600',
-  },
+  color: colors.white,
+  fontSize: fonts.small,
+  opacity: 0.8,
+},
   statsRow: {
     flexDirection: 'row',
     backgroundColor: colors.white,
@@ -420,5 +429,10 @@ profileBtn: {
 },
 profileBtnText: {
   fontSize: 18,
+},
+profileAvatar: {
+  width: 36,
+  height: 36,
+  borderRadius: 999,
 },
 });

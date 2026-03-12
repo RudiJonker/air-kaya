@@ -23,16 +23,21 @@ export const UTILITIES = [
 ];
 
 export const AMENITIES = [
-  { value: 'parking',   label: 'Parking',        icon: '🚗' },
-  { value: 'garage',    label: 'Garage',         icon: '🏠' },
-  { value: 'garden',    label: 'Garden / Yard',  icon: '🌿' },
-  { value: 'laundry',   label: 'Laundry Area',   icon: '👕' },
-  { value: 'security',  label: 'Security',       icon: '🔒' },
-  { value: 'pets',      label: 'Pets Allowed',   icon: '🐾' },
-  { value: 'kids',      label: 'Children OK',    icon: '👶' },
-  { value: 'furnished', label: 'Furnished',      icon: '🛋️' },
-  { value: 'braai',     label: 'Braai Area',     icon: '🔥' },
-  { value: 'storage',   label: 'Storage Room',   icon: '📦' },
+  { value: 'parking',        label: 'Parking',                    icon: '🚗' },
+  { value: 'garage',         label: 'Garage',                     icon: '🏠' },
+  { value: 'garden',         label: 'Garden / Yard',              icon: '🌿' },
+  { value: 'laundry',        label: 'Laundry Area',               icon: '👕' },
+  { value: 'security',       label: 'Security',                   icon: '🔒' },
+  { value: 'pets',           label: 'Pets Allowed',               icon: '🐾' },
+  { value: 'kids',           label: 'Children OK',                icon: '👶' },
+  { value: 'furnished',      label: 'Furnished',                  icon: '🛋️' },
+  { value: 'braai',          label: 'Braai Area',                 icon: '🔥' },
+  { value: 'storage',        label: 'Storage Room',               icon: '📦' },
+  { value: 'near_clinic',    label: 'Near Clinic',                icon: '🏥' },
+  { value: 'near_shops',     label: 'Near Shops',                 icon: '🛒' },
+  { value: 'near_schools',   label: 'Near Schools',               icon: '🏫' },
+  { value: 'near_church',    label: 'Near Church',                icon: '⛪' },
+  { value: 'near_taxi',      label: 'Near Taxi Route',            icon: '🚕' },
 ];
 
 export const PROVINCES = [
