@@ -17,15 +17,18 @@ export function AuthProvider({ children }) {
     });
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (_event, session) => {
-        setUser(session?.user ?? null);
-        if (session?.user) loadProfile(session.user.id);
-        else {
-          setProfile(null);
-          setLoading(false);
-        }
-      }
-    );
+  async (event, session) => {
+    // Don't navigate into app during password recovery
+    if (event === 'PASSWORD_RECOVERY') return;
+    
+    setUser(session?.user ?? null);
+    if (session?.user) loadProfile(session.user.id);
+    else {
+      setProfile(null);
+      setLoading(false);
+    }
+  }
+);
 
     return () => subscription.unsubscribe();
   }, []);

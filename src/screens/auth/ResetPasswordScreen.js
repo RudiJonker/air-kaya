@@ -32,10 +32,10 @@ export default function ResetPasswordScreen({ navigation }) {
       const { error } = await supabase.auth.updateUser({ password });
       if (error) throw error;
       Alert.alert(
-        'Password Updated! 🎉',
-        'Your password has been reset successfully. Please log in with your new password.',
-        [{ text: 'Go to Login', onPress: () => navigation.navigate('Login') }]
-      );
+  'Password Updated! 🎉',
+  'Your password has been reset successfully.',
+  [{ text: 'Continue', onPress: () => navigation.navigate('Login') }]
+);
     } catch (error) {
       console.error('Reset password error:', error);
       Alert.alert('Error', 'Could not update password. Please try again.');
