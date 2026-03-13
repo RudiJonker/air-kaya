@@ -2,7 +2,7 @@ import React, { useState, useCallback } from 'react';
 import {
   View, Text, StyleSheet, FlatList, Image,
   TouchableOpacity, TextInput, ActivityIndicator,
-  Alert, RefreshControl
+  Alert, RefreshControl, Share
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFocusEffect } from '@react-navigation/native';
@@ -14,6 +14,7 @@ import { listingService } from '../../utils/listingService';
 import { ACCOMMODATION_TYPES } from '../../constants/listing';
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 import CityAutocomplete from '../../components/common/CityAutocomplete';
+
 
 
 export default function BrowseScreen({ navigation }) {
@@ -30,7 +31,11 @@ export default function BrowseScreen({ navigation }) {
   }, [searchCity])
 );
 
-
+const handleShareApp = async () => {
+  await Share.share({
+    message: `🏡 Looking for affordable accommodation in South Africa?\n\nDownload Air Kaya and find your next home or list your property today — it's free!\n\n👉 https://drive.google.com/file/d/12RyehS3mWG7q6XTpBNTpr361CGNtalR6/view?usp=drive_link`,
+  });
+};
 
   const handleRefresh = async () => {
   setRefreshing(true);
@@ -133,17 +138,20 @@ export default function BrowseScreen({ navigation }) {
     <Text style={styles.headerGreeting}>
       Hi, {profile?.full_name?.split(' ')[0] || 'there'} 👋
     </Text>
-    <Text style={styles.headerSub}>Find your next home</Text>
+    <Text style={styles.headerSub}>Find a place to rent</Text>
   </View>
- <TouchableOpacity
-  onPress={() => navigation.navigate('Profile')}
-  style={styles.profileBtn}
->
-  {profile?.avatar_url
-    ? <Image source={{ uri: profile.avatar_url }} style={styles.profileAvatar} />
-    : <Text style={styles.profileBtnText}>👤</Text>
-  }
-</TouchableOpacity>
+  <TouchableOpacity
+    onPress={() => navigation.navigate('Profile')}
+    style={styles.profileBtn}
+  >
+    {profile?.avatar_url
+      ? <Image source={{ uri: profile.avatar_url }} style={styles.profileAvatar} />
+      : <Text style={styles.profileBtnText}>👤</Text>
+    }
+  </TouchableOpacity>
+  <TouchableOpacity onPress={handleShareApp} style={styles.shareBtn}>
+    <Text style={styles.shareBtnText}>📤</Text>
+  </TouchableOpacity>
   <TouchableOpacity onPress={handleSignOut} style={styles.signOutBtn}>
     <Text style={styles.signOutText}>Sign Out</Text>
   </TouchableOpacity>
@@ -425,5 +433,12 @@ const styles = StyleSheet.create({
   width: 36,
   height: 36,
   borderRadius: 999,
+},
+shareBtn: {
+  padding: spacing.xs,
+  marginRight: spacing.xs,
+},
+shareBtnText: {
+  fontSize: 22,
 },
 });

@@ -2,7 +2,7 @@ import React, { useState, useCallback } from 'react';
 import {
   View, Text, StyleSheet, TouchableOpacity,
   FlatList, Image, Alert, ActivityIndicator,
-  RefreshControl
+  RefreshControl, Share
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFocusEffect } from '@react-navigation/native';
@@ -25,6 +25,12 @@ export default function DashboardScreen({ navigation }) {
       loadListings();
     }, [])
   );
+
+  const handleShareApp = async () => {
+  await Share.share({
+    message: `🏡 Looking for affordable accommodation in South Africa?\n\nDownload Air Kaya and find your next home or list your property today — it's free!\n\n👉 https://drive.google.com/file/d/12RyehS3mWG7q6XTpBNTpr361CGNtalR6/view?usp=drive_link`,
+  });
+};
 
   const handleRefresh = async () => {
   setRefreshing(true);
@@ -177,14 +183,17 @@ export default function DashboardScreen({ navigation }) {
     <Text style={styles.headerSub}>Manage your listings</Text>
   </View>
   <TouchableOpacity
-  onPress={() => navigation.navigate('Profile')}
-  style={styles.profileBtn}
->
-  {profile?.avatar_url
-    ? <Image source={{ uri: profile.avatar_url }} style={styles.profileAvatar} />
-    : <Text style={styles.profileBtnText}>👤</Text>
-  }
-</TouchableOpacity>
+    onPress={() => navigation.navigate('Profile')}
+    style={styles.profileBtn}
+  >
+    {profile?.avatar_url
+      ? <Image source={{ uri: profile.avatar_url }} style={styles.profileAvatar} />
+      : <Text style={styles.profileBtnText}>👤</Text>
+    }
+  </TouchableOpacity>
+  <TouchableOpacity onPress={handleShareApp} style={styles.shareBtn}>
+    <Text style={styles.shareBtnText}>📤</Text>
+  </TouchableOpacity>
   <TouchableOpacity onPress={handleSignOut} style={styles.signOutBtn}>
     <Text style={styles.signOutText}>Sign Out</Text>
   </TouchableOpacity>
@@ -434,5 +443,12 @@ profileAvatar: {
   width: 36,
   height: 36,
   borderRadius: 999,
+},
+shareBtn: {
+  padding: spacing.xs,
+  marginRight: spacing.xs,
+},
+shareBtnText: {
+  fontSize: 22,
 },
 });
