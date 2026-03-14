@@ -201,10 +201,11 @@ export default function EditListingScreen({ navigation, route }) {
 )}
 
         {/* Add New Photos */}
-        <PhotosField
-          value={newPhotos}
-          onChange={setNewPhotos}
-        />
+<PhotosField
+  value={newPhotos}
+  onChange={setNewPhotos}
+  existingCount={existingPhotos.length}
+/>
 
         <View style={styles.divider} />
 

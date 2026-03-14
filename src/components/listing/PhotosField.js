@@ -9,27 +9,23 @@ import { colors, spacing, fonts } from '../../styles/theme';
 
 const MAX_PHOTOS = 6;
 
-export default function PhotosField({ value = [], onChange }) {
+export default function PhotosField({ value = [], onChange, existingCount = 0 }) {
+  const totalPhotos = value.length + existingCount;
+  
   const pickImage = async () => {
-  if (value.length >= MAX_PHOTOS) {
-    Alert.alert('Maximum Photos', `You can upload up to ${MAX_PHOTOS} photos.`);
-    return;
-  }
+    if (totalPhotos >= MAX_PHOTOS) {
+      Alert.alert('Maximum Photos', `You can upload up to ${MAX_PHOTOS} photos.`);
+      return;
+    }
+    // ...rest of function stays the same
+    const remaining = MAX_PHOTOS - totalPhotos;
 
-  const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-  if (status !== 'granted') {
-    Alert.alert('Permission Needed', 'Please allow access to your photo library.');
-    return;
-  }
-
-  const remaining = MAX_PHOTOS - value.length;
-
-  const result = await ImagePicker.launchImageLibraryAsync({
-    mediaTypes: ['images'],
-    allowsMultipleSelection: true,
-    selectionLimit: remaining,
-    quality: 1,
-  });
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ['images'],
+      allowsMultipleSelection: true,
+      selectionLimit: remaining,
+      quality: 1,
+    });
 
   if (!result.canceled && result.assets.length > 0) {
     const compressed = await Promise.all(
@@ -83,12 +79,12 @@ export default function PhotosField({ value = [], onChange }) {
           </TouchableOpacity>
         ))}
 
-        {value.length < MAX_PHOTOS && (
-          <TouchableOpacity style={styles.addBtn} onPress={pickImage}>
-            <Text style={styles.addBtnIcon}>📷</Text>
-            <Text style={styles.addBtnText}>Add Photo</Text>
-          </TouchableOpacity>
-        )}
+        {totalPhotos < MAX_PHOTOS && (
+  <TouchableOpacity style={styles.addBtn} onPress={pickImage}>
+    <Text style={styles.addBtnIcon}>📷</Text>
+    <Text style={styles.addBtnText}>Add Photo</Text>
+  </TouchableOpacity>
+)}
       </View>
     </View>
   );
