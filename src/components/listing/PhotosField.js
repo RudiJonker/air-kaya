@@ -11,32 +11,39 @@ const MAX_PHOTOS = 6;
 
 export default function PhotosField({ value = [], onChange }) {
   const pickImage = async () => {
-    if (value.length >= MAX_PHOTOS) {
-      Alert.alert('Maximum Photos', `You can upload up to ${MAX_PHOTOS} photos.`);
-      return;
-    }
+  if (value.length >= MAX_PHOTOS) {
+    Alert.alert('Maximum Photos', `You can upload up to ${MAX_PHOTOS} photos.`);
+    return;
+  }
 
-    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (status !== 'granted') {
-      Alert.alert('Permission Needed', 'Please allow access to your photo library.');
-      return;
-    }
+  const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+  if (status !== 'granted') {
+    Alert.alert('Permission Needed', 'Please allow access to your photo library.');
+    return;
+  }
 
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsMultipleSelection: false,
-      quality: 1,
-    });
+  const remaining = MAX_PHOTOS - value.length;
 
-    if (!result.canceled && result.assets[0]) {
-      const compressed = await ImageManipulator.manipulateAsync(
-        result.assets[0].uri,
-        [{ resize: { width: 1024 } }],
-        { compress: 0.7, format: ImageManipulator.SaveFormat.JPEG }
-      );
-      onChange([...value, compressed.uri]);
-    }
-  };
+  const result = await ImagePicker.launchImageLibraryAsync({
+    mediaTypes: ['images'],
+    allowsMultipleSelection: true,
+    selectionLimit: remaining,
+    quality: 1,
+  });
+
+  if (!result.canceled && result.assets.length > 0) {
+    const compressed = await Promise.all(
+      result.assets.map(asset =>
+        ImageManipulator.manipulateAsync(
+          asset.uri,
+          [{ resize: { width: 1024 } }],
+          { compress: 0.7, format: ImageManipulator.SaveFormat.JPEG }
+        )
+      )
+    );
+    onChange([...value, ...compressed.map(c => c.uri)]);
+  }
+};
 
   const removeImage = (index) => {
     Alert.alert('Remove Photo', 'Remove this photo?', [
