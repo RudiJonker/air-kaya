@@ -33,7 +33,7 @@ export default function LocationField({ city, province, suburb, onCityChange, on
 
       if (geocode.length > 0) {
         const { city: geoCity, subregion, district, region } = geocode[0];
-console.log('Geocode result:', JSON.stringify(geocode[0]));
+
 
 const detectedCity = geoCity;
 const detectedProvince = region;

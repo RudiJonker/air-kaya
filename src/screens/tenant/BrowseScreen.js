@@ -164,7 +164,7 @@ const handleShareApp = async () => {
   <View style={styles.searchInputWrapper}>
     <CityAutocomplete
       value={searchCity}
-      placeholder="Enter suburb, city or province..."
+      placeholder="Suburb, city or province"
       onSelectCity={(city) => {
         setSearchCity(city);
         loadListings(city);

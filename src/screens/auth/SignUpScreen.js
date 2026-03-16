@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import {
   View, Text, TextInput, TouchableOpacity,
-  StyleSheet, Alert, ScrollView
+  StyleSheet, Alert, ScrollView, KeyboardAvoidingView, Platform
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { colors, spacing, fonts } from '../../styles/theme';
@@ -54,10 +54,7 @@ export default function SignUpScreen({ navigation, route }) {
         });
         if (profileError) throw profileError;
 
-        // Wait for profile to be committed to the database
         await new Promise(resolve => setTimeout(resolve, 800));
-
-        // Refresh profile with the new user ID to trigger navigation
         await refreshProfile(authData.user.id);
       }
 
@@ -77,68 +74,73 @@ export default function SignUpScreen({ navigation, route }) {
 
   return (
     <SafeAreaView style={styles.safe}>
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
-          <Text style={styles.backText}>← Back</Text>
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Create Account</Text>
-        <View style={{ width: 60 }} />
-      </View>
-
-      <ScrollView contentContainerStyle={styles.scroll}>
-        <View style={styles.roleBadge}>
-          <Text style={styles.roleBadgeText}>Signing up as: {roleLabel}</Text>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        style={{ flex: 1 }}
+      >
+        <View style={styles.header}>
+          <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
+            <Text style={styles.backText}>← Back</Text>
+          </TouchableOpacity>
+          <Text style={styles.headerTitle}>Create Account</Text>
+          <View style={{ width: 60 }} />
         </View>
 
-        <Text style={styles.label}>Email Address</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="your@email.com"
-          placeholderTextColor={colors.border}
-          value={formData.email}
-          onChangeText={(v) => updateField('email', v)}
-          autoCapitalize="none"
-          keyboardType="email-address"
-          autoComplete="email"
-        />
+        <ScrollView contentContainerStyle={styles.scroll}>
+          <View style={styles.roleBadge}>
+            <Text style={styles.roleBadgeText}>Signing up as: {roleLabel}</Text>
+          </View>
 
-        <Text style={styles.label}>Password</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Minimum 6 characters"
-          placeholderTextColor={colors.border}
-          value={formData.password}
-          onChangeText={(v) => updateField('password', v)}
-          secureTextEntry
-        />
+          <Text style={styles.label}>Email Address</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="your@email.com"
+            placeholderTextColor={colors.border}
+            value={formData.email}
+            onChangeText={(v) => updateField('email', v)}
+            autoCapitalize="none"
+            keyboardType="email-address"
+            autoComplete="email"
+          />
 
-        <Text style={styles.label}>Confirm Password</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Repeat your password"
-          placeholderTextColor={colors.border}
-          value={formData.confirmPassword}
-          onChangeText={(v) => updateField('confirmPassword', v)}
-          secureTextEntry
-        />
+          <Text style={styles.label}>Password</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Minimum 6 characters"
+            placeholderTextColor={colors.border}
+            value={formData.password}
+            onChangeText={(v) => updateField('password', v)}
+            secureTextEntry
+          />
 
-        <TouchableOpacity
-          style={[styles.submitBtn, loading && styles.submitBtnDisabled]}
-          onPress={handleSignUp}
-          disabled={loading}
-        >
-          <Text style={styles.submitBtnText}>
-            {loading ? 'Creating Account...' : 'Create Account'}
-          </Text>
-        </TouchableOpacity>
+          <Text style={styles.label}>Confirm Password</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Repeat your password"
+            placeholderTextColor={colors.border}
+            value={formData.confirmPassword}
+            onChangeText={(v) => updateField('confirmPassword', v)}
+            secureTextEntry
+          />
 
-        <TouchableOpacity
-          style={styles.loginLink}
-          onPress={() => navigation.navigate('Login')}
-        >
-          <Text style={styles.loginLinkText}>Already have an account? Log In</Text>
-        </TouchableOpacity>
-      </ScrollView>
+          <TouchableOpacity
+            style={[styles.submitBtn, loading && styles.submitBtnDisabled]}
+            onPress={handleSignUp}
+            disabled={loading}
+          >
+            <Text style={styles.submitBtnText}>
+              {loading ? 'Creating Account...' : 'Create Account'}
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.loginLink}
+            onPress={() => navigation.navigate('Login')}
+          >
+            <Text style={styles.loginLinkText}>Already have an account? Log In</Text>
+          </TouchableOpacity>
+        </ScrollView>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }

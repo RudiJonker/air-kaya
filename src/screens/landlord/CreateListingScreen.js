@@ -33,6 +33,8 @@ export default function CreateListingScreen({ navigation }) {
       deposit_amount: '',
     },
     location: {
+      
+      suburb: '',
       city: '',
       province: '',
     },
@@ -84,7 +86,8 @@ export default function CreateListingScreen({ navigation }) {
           ? Number(form.pricing.deposit_amount)
           : null,
         city: form.location.city.trim(),
-        province: form.location.province.trim(),
+suburb: form.location.suburb?.trim() || '',
+province: form.location.province.trim(),
         description: form.description.trim(),
         contact_pref: form.contact_pref,
         phone: form.phone.trim(),
