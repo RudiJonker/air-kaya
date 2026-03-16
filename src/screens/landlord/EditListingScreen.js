@@ -34,9 +34,10 @@ export default function EditListingScreen({ navigation, route }) {
       deposit_amount: listing.deposit_amount ? String(listing.deposit_amount) : '',
     },
     location: {
-      city: listing.city || '',
-      province: listing.province || '',
-    },
+  suburb: listing.suburb || '',
+  city: listing.city || '',
+  province: listing.province || '',
+},
     description: listing.description || '',
     contact_pref: listing.contact_pref || 'whatsapp',
     phone: listing.phone || '',
@@ -95,8 +96,9 @@ export default function EditListingScreen({ navigation, route }) {
         deposit_amount: form.pricing.deposit_amount
           ? Number(form.pricing.deposit_amount)
           : null,
-        city: form.location.city.trim(),
-        province: form.location.province.trim(),
+        suburb: form.location.suburb.trim(),
+city: form.location.city.trim(),
+province: form.location.province.trim(),
         description: form.description.trim(),
         contact_pref: form.contact_pref,
         phone: form.phone.trim(),

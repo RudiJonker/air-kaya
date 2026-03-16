@@ -2,7 +2,7 @@ import React, { useState, useCallback } from 'react';
 import {
   View, Text, StyleSheet, FlatList, Image,
   TouchableOpacity, TextInput, ActivityIndicator,
-  Alert, RefreshControl, Share
+  Alert, RefreshControl, Share, Modal
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFocusEffect } from '@react-navigation/native';
@@ -17,12 +17,14 @@ import CityAutocomplete from '../../components/common/CityAutocomplete';
 
 
 
+
 export default function BrowseScreen({ navigation }) {
   const { user, profile } = useAuth();
   const [listings, setListings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchCity, setSearchCity] = useState(profile?.city || '');
   const [refreshing, setRefreshing] = useState(false);
+  const [showLocationInfo, setShowLocationInfo] = useState(false);
   
 
   useFocusEffect(
@@ -105,7 +107,7 @@ const handleShareApp = async () => {
         }
         <View style={styles.cardBody}>
           <Text style={styles.cardType}>{getTypeLabel(item.type)}</Text>
-          <Text style={styles.cardCity}>📍 {item.city}, {item.province}</Text>
+          <Text style={styles.cardCity}>📍 {[item.suburb, item.city, item.province].filter(Boolean).join(', ')}</Text>
           <Text style={styles.cardPrice}>
             R{item.price_amount}
             <Text style={styles.cardPricePeriod}>
@@ -162,17 +164,46 @@ const handleShareApp = async () => {
   <View style={styles.searchInputWrapper}>
     <CityAutocomplete
       value={searchCity}
-      placeholder="Search by city..."
+      placeholder="Enter suburb, city or province..."
       onSelectCity={(city) => {
         setSearchCity(city);
         loadListings(city);
       }}
     />
   </View>
+  <TouchableOpacity style={styles.infoBtn} onPress={() => setShowLocationInfo(true)}>
+    <Text style={styles.infoBtnText}>ℹ️</Text>
+  </TouchableOpacity>
   <TouchableOpacity style={styles.searchBtn} onPress={handleSearch}>
     <Text style={styles.searchBtnText}>Search</Text>
   </TouchableOpacity>
 </View>
+
+{/* Location Info Modal */}
+<Modal
+  visible={showLocationInfo}
+  transparent
+  animationType="fade"
+  onRequestClose={() => setShowLocationInfo(false)}
+>
+  <View style={styles.modalOverlay}>
+    <View style={styles.modalCard}>
+      <Text style={styles.modalTitle}>📍 Location Names</Text>
+      <Text style={styles.modalBody}>
+        Some location databases use new Municipal names instead of well-known area names.{'\n\n'}
+        For example, "East London" may appear as "KuGompo", or "Buffalo City".{'\n\n'}
+        If you can't find listings in your area, try searching using the alternative city name, or searching by suburb or province instead.{'\n\n'}
+        
+      </Text>
+      <TouchableOpacity
+        style={styles.modalCloseBtn}
+        onPress={() => setShowLocationInfo(false)}
+      >
+        <Text style={styles.modalCloseBtnText}>Got it</Text>
+      </TouchableOpacity>
+    </View>
+  </View>
+</Modal>
 
       {/* Results Count */}
       {!loading && (
@@ -440,5 +471,48 @@ shareBtn: {
 },
 shareBtnText: {
   fontSize: 22,
+},
+infoBtn: {
+  padding: spacing.sm,
+  marginRight: spacing.xs,
+},
+infoBtnText: {
+  fontSize: 20,
+},
+modalOverlay: {
+  flex: 1,
+  backgroundColor: 'rgba(0,0,0,0.5)',
+  alignItems: 'center',
+  justifyContent: 'center',
+  padding: spacing.lg,
+},
+modalCard: {
+  backgroundColor: colors.white,
+  borderRadius: 12,
+  padding: spacing.lg,
+  width: '100%',
+},
+modalTitle: {
+  fontSize: fonts.large,
+  fontWeight: '700',
+  color: colors.dark,
+  marginBottom: spacing.md,
+},
+modalBody: {
+  fontSize: fonts.body,
+  color: colors.dark,
+  lineHeight: 24,
+  marginBottom: spacing.lg,
+},
+modalCloseBtn: {
+  backgroundColor: colors.primary,
+  padding: spacing.md,
+  borderRadius: 8,
+  alignItems: 'center',
+},
+modalCloseBtnText: {
+  color: colors.white,
+  fontSize: fonts.medium,
+  fontWeight: 'bold',
 },
 });

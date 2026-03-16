@@ -5,17 +5,13 @@ import LocationField from '../common/LocationField';
 
 export default function ListingLocationField({ value = {}, onChange }) {
 
-  const handleBothFields = (cityVal, provinceVal) => {
-    onChange({ ...value, city: cityVal, province: provinceVal });
+  const handleBothFields = (cityVal, provinceVal, suburbVal) => {
+    onChange({ ...value, city: cityVal, province: provinceVal, suburb: suburbVal || value.suburb || '' });
   };
 
-  const updateCity = (val) => {
-    onChange({ ...value, city: val });
-  };
-
-  const updateProvince = (val) => {
-    onChange({ ...value, province: val });
-  };
+  const updateCity = (val) => onChange({ ...value, city: val });
+  const updateProvince = (val) => onChange({ ...value, province: val });
+  const updateSuburb = (val) => onChange({ ...value, suburb: val });
 
   return (
     <View style={styles.container}>
@@ -23,10 +19,12 @@ export default function ListingLocationField({ value = {}, onChange }) {
       <LocationField
         city={value.city || ''}
         province={value.province || ''}
+        suburb={value.suburb || ''}
         onCityChange={updateCity}
         onProvinceChange={updateProvince}
+        onSuburbChange={updateSuburb}
         onBothChange={handleBothFields}
-        helpText="Tenants will search by city so make sure this is correct."
+        helpText="Tenants will search by suburb or city so make sure this is correct."
       />
     </View>
   );

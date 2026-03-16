@@ -134,7 +134,7 @@ export default function DashboardScreen({ navigation }) {
               <Text style={styles.statusText}>{isActive ? '● Active' : '● Paused'}</Text>
             </View>
             <Text style={styles.cardType}>{getTypeLabel(item.type)}</Text>
-            <Text style={styles.cardCity}>{item.city}, {item.province}</Text>
+            <Text style={styles.cardCity}>{[item.suburb, item.city, item.province].filter(Boolean).join(', ')}</Text>
             <Text style={styles.cardPrice}>
               R{item.price_amount} / {item.price_period === 'monthly' ? 'month' : 'week'}
             </Text>

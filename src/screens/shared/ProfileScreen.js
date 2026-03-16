@@ -20,11 +20,12 @@ export default function ProfileScreen({ navigation }) {
   const [avatarLoading, setAvatarLoading] = useState(false);
   const [avatarUrl, setAvatarUrl] = useState(profile?.avatar_url || null);
   const [form, setForm] = useState({
-    full_name: profile?.full_name || '',
-    phone: profile?.phone || '',
-    city: profile?.city || '',
-    province: profile?.province || '',
-  });
+  full_name: profile?.full_name || '',
+  phone: profile?.phone || '',
+  suburb: profile?.suburb || '',
+  city: profile?.city || '',
+  province: profile?.province || '',
+});
 
   const updateField = (field, value) => {
     setForm(prev => ({ ...prev, [field]: value }));
@@ -138,22 +139,24 @@ export default function ProfileScreen({ navigation }) {
     setLoading(true);
     try {
       const { error } = await authService.updateProfile(user.id, {
-        full_name: form.full_name.trim(),
-        phone: form.phone.trim(),
-        city: form.city.trim(),
-        province: form.province.trim(),
-        updated_at: new Date().toISOString(),
-      });
+  full_name: form.full_name.trim(),
+  phone: form.phone.trim(),
+  suburb: form.suburb.trim(),
+  city: form.city.trim(),
+  province: form.province.trim(),
+  updated_at: new Date().toISOString(),
+});
 
       if (error) throw error;
 
       await storageService.setUserProfile({
-        ...profile,
-        full_name: form.full_name.trim(),
-        phone: form.phone.trim(),
-        city: form.city.trim(),
-        province: form.province.trim(),
-      });
+  ...profile,
+  full_name: form.full_name.trim(),
+  phone: form.phone.trim(),
+  suburb: form.suburb.trim(),
+  city: form.city.trim(),
+  province: form.province.trim(),
+});
 
       await refreshProfile();
 
@@ -240,14 +243,16 @@ export default function ProfileScreen({ navigation }) {
         <View style={styles.divider} />
 
         <LocationField
-          city={form.city}
-          province={form.province}
-          onCityChange={(v) => updateField('city', v)}
-          onProvinceChange={(v) => updateField('province', v)}
-          onBothChange={(city, province) => {
-            setForm(prev => ({ ...prev, city, province }));
-          }}
-        />
+  city={form.city}
+  province={form.province}
+  suburb={form.suburb}
+  onCityChange={(v) => updateField('city', v)}
+  onProvinceChange={(v) => updateField('province', v)}
+  onSuburbChange={(v) => updateField('suburb', v)}
+  onBothChange={(city, province, suburb) => {
+    setForm(prev => ({ ...prev, city, province, suburb: suburb || prev.suburb }));
+  }}
+/>
 
         <View style={styles.divider} />
 

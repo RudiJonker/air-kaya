@@ -36,17 +36,21 @@ export const listingService = {
       .order('created_at', { ascending: false });
   },
 
-  getActiveListings: async (city) => {
-    let query = supabase
-      .from('listings')
-      .select('*, listing_images(*), profiles(full_name, avatar_url)')
-      .eq('status', 'active')
-      .order('created_at', { ascending: false });
+  getActiveListings: async (searchText) => {
+  let query = supabase
+    .from('listings')
+    .select('*, listing_images(*), profiles(full_name, avatar_url)')
+    .eq('status', 'active')
+    .order('created_at', { ascending: false });
 
-    if (city) query = query.ilike('city', `%${city}%`);
+  if (searchText) {
+    query = query.or(
+      `city.ilike.%${searchText}%,suburb.ilike.%${searchText}%,province.ilike.%${searchText}%`
+    );
+  }
 
-    return await query;
-  },
+  return await query;
+},
 
   getListingById: async (id) => {
     return await supabase

@@ -18,11 +18,12 @@ export default function CompleteProfileScreen({ route }) {
   
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
-    full_name: '',
-    phone: '',
-    city: '',
-    province: '',
-  });
+  full_name: '',
+  phone: '',
+  city: '',
+  province: '',
+  suburb: '',
+});
 
   const updateField = (field, value) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -59,26 +60,28 @@ export default function CompleteProfileScreen({ route }) {
     setLoading(true);
     try {
       const { error } = await authService.updateProfile(userId, {
-        full_name: formData.full_name.trim(),
-        phone: formData.phone.trim(),
-        city: formData.city.trim(),
-        province: formData.province.trim(),
-        is_profile_complete: true,
-        updated_at: new Date().toISOString(),
-      });
+  full_name: formData.full_name.trim(),
+  phone: formData.phone.trim(),
+  suburb: formData.suburb.trim(),
+  city: formData.city.trim(),
+  province: formData.province.trim(),
+  is_profile_complete: true,
+  updated_at: new Date().toISOString(),
+});
 
       if (error) throw error;
 
       await storageService.setUserProfile({
-        id: userId,
-        email,
-        role,
-        full_name: formData.full_name.trim(),
-        phone: formData.phone.trim(),
-        city: formData.city.trim(),
-        province: formData.province.trim(),
-        is_profile_complete: true,
-      });
+  id: userId,
+  email,
+  role,
+  full_name: formData.full_name.trim(),
+  phone: formData.phone.trim(),
+  suburb: formData.suburb.trim(),
+  city: formData.city.trim(),
+  province: formData.province.trim(),
+  is_profile_complete: true,
+});
 
       await refreshProfile();
 
@@ -128,14 +131,16 @@ export default function CompleteProfileScreen({ route }) {
         />
 
         <LocationField
-          city={formData.city}
-          province={formData.province}
-          onCityChange={(v) => updateField('city', v)}
-          onProvinceChange={(v) => updateField('province', v)}
-          onBothChange={(city, province) => {
-            setFormData(prev => ({ ...prev, city, province }));
-          }}
-        />
+  city={formData.city}
+  province={formData.province}
+  suburb={formData.suburb}
+  onCityChange={(v) => updateField('city', v)}
+  onProvinceChange={(v) => updateField('province', v)}
+  onSuburbChange={(v) => updateField('suburb', v)}
+  onBothChange={(city, province, suburb) => {
+    setFormData(prev => ({ ...prev, city, province, suburb: suburb || prev.suburb }));
+  }}
+/>
 
         <TouchableOpacity
           style={[styles.submitBtn, loading && styles.submitBtnDisabled]}
